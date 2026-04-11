@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>服装电商智能体</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- 自定义样式 -->
+    <style>
+        :root {
+            --primary-50: #f0f9ff;
+            --primary-100: #e0f2fe;
+            --primary-200: #bae6fd;
+            --primary-300: #7dd3fc;
+            --primary-400: #38bdf8;
+            --primary-500: #0ea5e9;
+            --primary-600: #0284c7;
+            --primary-700: #0369a1;
+            --primary-800: #075985;
+            --primary-900: #0c4a6e;
+            --secondary-50: #f8fafc;
+            --secondary-100: #f1f5f9;
+            --secondary-200: #e2e8f0;
+            --secondary-300: #cbd5e1;
+            --secondary-400: #94a3b8;
+            --secondary-500: #64748b;
+            --secondary-600: #475569;
+            --secondary-700: #334155;
+            --secondary-800: #1e293b;
+            --secondary-900: #0f172a;
+            --accent-50: #f0fdfa;
+            --accent-100: #ccfbf1;
+            --accent-200: #99f6e4;
+            --accent-300: #5eead4;
+            --accent-400: #2dd4bf;
+            --accent-500: #14b8a6;
+            --accent-600: #0d9488;
+            --accent-700: #0f766e;
+            --accent-800: #115e59;
+            --accent-900: #134e4a;
+            --success-50: #f0fdf4;
+            --success-100: #dcfce7;
+            --success-200: #bbf7d0;
+            --success-300: #86efac;
+            --success-400: #4ade80;
+            --success-500: #22c55e;
+            --success-600: #16a34a;
+            --success-700: #15803d;
+            --success-800: #166534;
+            --success-900: #14532d;
+            --foreground-rgb: 0, 0, 0;
+            --background-start-rgb: 214, 219, 220;
+            --background-end-rgb: 255, 255, 255;
+            --text-color: #475569;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            font-family: 'Inter', 'Noto Sans SC', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 0.5rem 0;
+            transition: all 0.3s ease;
+            height: 64px;
+        }
+        
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand i {
+            font-size: 1.8rem;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .nav-link {
+            color: #4b5563 !important;
+            font-weight: 500;
+            margin: 0 0.25rem;
+            padding: 0.5rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 0.95rem;
+        }
+        
+        .nav-link:hover {
+            color: #0ea5e9 !important;
+            background: rgba(14, 165, 233, 0.08);
+            transform: translateY(-1px);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        /* 头部样式 */
+        .header {
+            background: #ffffff;
+            color: #1f2937;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 0;
+            padding: 0;
+        }
+        
+        /* 蓝绿色渐变背景团 */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(20, 184, 166, 0.1) 40%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            left: -5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, rgba(14, 165, 233, 0.08) 40%, transparent 70%);
+            border-radius: 50%;
+            animation: float 8s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-20px) scale(1.05);
+            }
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInDown 1s ease-out;
+            letter-spacing: -1px;
+        }
+        
+        .header p {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInUp 1s ease-out 0.3s both;
+            font-weight: 300;
+            line-height: 1.8;
+        }
+        
+        .header-buttons {
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+        
+        .header-buttons .btn {
+            font-size: 1.1rem;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: none;
+            letter-spacing: 0;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+        
+        .header-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        }
+        
+        /* 容器样式 */
+        .container {
+            flex: 1;
+            padding: 4rem 0;
+        }
+        
+        /* 卡片样式 */
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            background: #fff;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+            border-color: #d1d5db;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            color: #fff;
+            padding: 1.5rem;
+            border-bottom: none;
+        }
+        
+        .card-body {
+            padding: 2.5rem;
+        }
+        
+        /* 按钮样式 */
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            text-transform: none;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(14, 165, 233, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #0ea5e9;
+            color: #0ea5e9;
+            background: transparent;
+        }
+        
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            color: #fff;
+            border-color: transparent;
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #d1d5db;
+            color: #6b7280;
+            background: transparent;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #f3f4f6;
+            color: #374151;
+            border-color: #9ca3af;
+        }
+        
+        /* 身份选择页面 */
+        .identity-section {
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .identity-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .identity-section p {
+            font-size: 1.3rem;
+            color: var(--text-color);
+            margin-bottom: 3rem;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 300;
+        }
+        
+        .identity-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 3rem;
+            gap: 2rem;
+        }
+        
+        .identity-btn {
+            width: 260px;
+            height: 260px;
+            border-radius: 35px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            letter-spacing: 1px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .identity-btn i {
+            font-size: 4.5rem;
+            margin-bottom: 1.2rem;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+        }
+        
+        .identity-btn:hover i {
+            transform: scale(1.15) rotate(5deg);
+        }
+        
+        .identity-btn span {
+            font-size: 1.5rem;
+        }
+        
+        .identity-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .identity-btn:hover::before {
+            left: 100%;
+        }
+        
+        .identity-btn:hover {
+            transform: scale(1.08) translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .merchant-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--white);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .merchant-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.5);
+        }
+        
+        .customer-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: var(--white);
+            box-shadow: 0 15px 40px rgba(245, 87, 108, 0.4);
+        }
+        
+        .customer-btn:hover {
+            background: linear-gradient(135deg, #ec4899 0%, #e11d48 100%);
+            box-shadow: 0 25px 50px rgba(245, 87, 108, 0.5);
+        }
+        
+        /* 多彩按钮样式 */
+        .btn-gradient-blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .btn-gradient-green {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(67, 233, 123, 0.4);
+        }
+        
+        .btn-gradient-orange {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(250, 112, 154, 0.4);
+        }
+        
+        .btn-gradient-purple {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            box-shadow: 0 4px 15px rgba(168, 237, 234, 0.4);
+        }
+        
+        .btn-gradient-blue:hover,
+        .btn-gradient-green:hover,
+        .btn-gradient-orange:hover,
+        .btn-gradient-purple:hover {
+            transform: translateY(-3px);
+            filter: brightness(1.1);
+        }
+        
+        /* 功能区域 */
+        .feature-section {
+            margin-top: 4rem;
+        }
+        
+        .feature-card {
+            border-radius: 25px;
+            padding: 3rem;
+            margin-bottom: 2.5rem;
+            background: var(--white);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.9rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            font-weight: 700;
+        }
+        
+        .feature-card p {
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .feature-card ul li {
+            padding: 0.8rem 0;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-color);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+        
+        .feature-card ul li::before {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 0.8rem;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+        
+        .feature-card i {
+            font-size: 4rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+        }
+        
+        .feature-card:hover i {
+            transform: scale(1.15) rotate(-5deg);
+            filter: drop-shadow(0 6px 12px rgba(102, 126, 234, 0.4));
+        }
+        
+        .feature-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+        }
+        
+        .feature-btn {
+            flex: 1;
+            min-width: 160px;
+        }
+        
+        /* 聊天容器 */
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border-radius: 20px;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            margin-bottom: 1.5rem;
+            border: 2px solid #e2e8f0;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .message {
+            margin-bottom: 1.5rem;
+            max-width: 80%;
+            padding: 1.2rem 1.5rem;
+            border-radius: 25px;
+            position: relative;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .user-message {
+            background: var(--gradient-1);
+            color: #000000;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 8px;
+        }
+        
+        .bot-message {
+            background: var(--white);
+            color: var(--dark-color);
+            border: 2px solid #e2e8f0;
+            align-self: flex-start;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 0.75rem;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            border-radius: 50px;
+            padding: 1rem 1.75rem;
+            border: 1px solid #ced4da;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .chat-input button {
+            border-radius: 50px;
+            padding: 1rem 1.75rem;
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            margin-bottom: 2rem;
+            background: var(--white);
+            color: var(--dark-color);
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            display: inline-block;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .back-btn:hover {
+            background: var(--gradient-1);
+            color: var(--white);
+            border-color: transparent;
+            transform: translateX(-8px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        /* 卡片标题 */
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid;
+            border-image: var(--gradient-1) 1;
+        }
+        
+        /* AI示例 */
+        .ai-examples {
+            margin-bottom: 1.5rem;
+        }
+        
+        .ai-example {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 1.2rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            font-weight: 500;
+        }
+        
+        .ai-example:hover {
+            background: var(--white);
+            transform: translateX(15px) scale(1.02);
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        .ai-example p {
+            margin: 0;
+            color: var(--text-color);
+        }
+        
+        /* 通知卡片 */
+        .notification-card {
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            background: var(--white);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+        }
+        
+        .notification-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary-color);
+        }
+        
+        .notification-card h3 {
+            font-size: 1.7rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            font-weight: 700;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid;
+            border-image: var(--gradient-1) 1;
+        }
+        
+        .notification-card p {
+            color: var(--text-color);
+            margin-bottom: 1.2rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        /* 页脚 */
+        .footer {
+            background: var(--gradient-hero);
+            color: var(--white);
+            text-align: center;
+            padding: 4rem 0;
+            margin-top: 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: var(--light-color);
+            clip-path: ellipse(60% 100px at 50% 0%);
+        }
+        
+        .footer-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .footer p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+        
+        .footer-links {
+            margin-top: 1.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--white);
+            margin: 0 1rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: none;
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+        
+        /* 统计数据 */
+        .stats-section {
+            margin-top: 4rem;
+            padding: 5rem;
+            background: var(--white);
+            border-radius: 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease-out 0.5s both;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-1);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 3rem;
+            border-radius: 25px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .stat-card h4 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.8rem;
+        }
+        
+        .stat-card p {
+            color: var(--text-color);
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .stat-icon {
+            font-size: 3.5rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.2rem;
+            filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+        }
+        
+        /* 部分标题 */
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            color: var(--dark-color);
+            margin-bottom: 3.5rem;
+            text-align: center;
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 5px;
+            background: var(--gradient-1);
+            border-radius: 10px;
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* 滚动动画 */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        .scroll-animate.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* 关于我们区域 */
+        .about-section {
+            padding: 6rem 0;
+            background: #ffffff;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .about-section::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            right: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(14, 165, 233, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .about-content {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+        
+        .about-text {
+            flex: 1;
+        }
+        
+        .about-text h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1rem;
+        }
+        
+        .about-text h3::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #14b8a6 100%);
+            border-radius: 2px;
+        }
+        
+        .about-text p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+        }
+        
+        .about-image {
+            flex: 1;
+            position: relative;
+        }
+        
+        .about-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+        }
+        
+        .team-info {
+            background: linear-gradient(135deg, #f0f9ff 0%, #f0fdfa 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .team-info h4 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0ea5e9;
+            margin-bottom: 1rem;
+        }
+        
+        .team-info p {
+            color: #4b5563;
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* 功能卡片新样式 */
+        .feature-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--white);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s ease;
+        }
+        
+        .feature-card:hover .feature-icon-wrapper {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: var(--text-color);
+            font-size: 1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        /* 功能特色区域 */
+        .features-highlight {
+            padding: 6rem 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8eaf6 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .features-highlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        
+        .feature-highlight-card {
+            background: var(--white);
+            border-radius: 25px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            border: 2px solid transparent;
+        }
+        
+        .feature-highlight-card:hover {
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-color);
+        }
+        
+        .feature-highlight-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+            color: var(--white);
+            background: var(--gradient-1);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.4s ease;
+        }
+        
+        .feature-highlight-card:hover .feature-highlight-icon {
+            transform: scale(1.1) rotate(360deg);
+        }
+        
+        .feature-highlight-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1.2rem;
+        }
+        
+        .feature-highlight-card p {
+            color: var(--text-color);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header {
+                padding: 8rem 0 4rem;
+            }
+            
+            .header h1 {
+                font-size: 2.8rem;
+            }
+            
+            .header p {
+                font-size: 1.2rem;
+            }
+            
+            .identity-section {
+                padding: 3rem 2rem;
+                margin: -3rem 1rem 3rem;
+            }
+            
+            .identity-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .identity-btn {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .stats-section {
+                padding: 3rem 2rem;
+            }
+            
+            .stat-card h4 {
+                font-size: 2.5rem;
+            }
+            
+            .feature-card {
+                padding: 2rem;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .header {
+                padding: 7rem 0 3rem;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .identity-section {
+                padding: 2rem 1.5rem;
+            }
+            
+            .identity-section h2 {
+                font-size: 2rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .identity-btn {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .feature-highlight-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#header" onclick="showIdentityPage(); return false;">
+                <i class="fas fa-magic"></i> 智能体
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showHomePage(); return false;"><i class="fas fa-home"></i> 首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features" onclick="window.scrollTo({top: document.getElementById('features').offsetTop - 70, behavior: 'smooth'}); return false;"><i class="fas fa-star"></i> 功能介绍</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showMerchantPage(); return false;"><i class="fas fa-store"></i> 商家中心</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showCustomerPage(); return false;"><i class="fas fa-shopping-bag"></i> 顾客中心</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about" onclick="window.scrollTo({top: document.getElementById('about').offsetTop - 70, behavior: 'smooth'}); return false;"><i class="fas fa-info-circle"></i> 关于我们</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="animate__animated animate__fadeInDown">服装电商智能体</h1>
+            <p class="animate__animated animate__fadeInUp">为服装电商提供全方位的智能解决方案，助力商家提升运营效率，为顾客提供优质服务</p>
+            <div class="header-buttons animate__animated animate__fadeIn">
+                <a href="#identitySection" class="btn btn-primary btn-lg">开始体验</a>
+            </div>
+        </div>
+    </header>
+
+
+
+    <!-- 功能介绍 -->
+    <div class="container py-10" id="features">
+        <h2 class="section-title scroll-animate">功能介绍</h2>
+        <p class="text-center text-muted mb-5" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">全方位的智能解决方案，助力服装电商业务腾飞</p>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #667eea;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>智能文案</h3>
+                    <p>AI一键生成商品标题、详情文案，支持多种风格，让每件商品都有吸引人的描述</p>
+                    <span class="feature-badge" style="background: #667eea;">效率提升500%</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #f093fb;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="2"/>
+                            <path d="M12 22V12" stroke="white" stroke-width="2"/>
+                            <path d="M12 12C14.2091 12 16 10.2091 16 8" stroke="white" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <h3>数据分析</h3>
+                    <p>深度分析销售数据、用户行为，智能推荐爆款商品，优化库存管理，降低滞销风险</p>
+                    <span class="feature-badge" style="background: #f5576c;">精准预测</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #4facfe;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="7" y="4" width="10" height="12" rx="2" ry="2" stroke="white" stroke-width="2"/>
+                            <rect x="9" y="16" width="6" height="4" stroke="white" stroke-width="2"/>
+                            <circle cx="10" cy="8" r="1" fill="white"/>
+                            <circle cx="14" cy="8" r="1" fill="white"/>
+                            <path d="M12 10L12 12" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                    <h3>智能客服</h3>
+                    <p>7×24小时在线客服，自动回复常见问题，处理售后问题，提升客户满意度</p>
+                    <span class="feature-badge" style="background: #4facfe;">响应速度&lt;1秒</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #43e97b;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="white" stroke-width="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5" fill="white"/>
+                            <path d="M21 15L16 10L5 21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>视觉优化</h3>
+                    <p>智能图片处理、背景替换、风格转换，让商品图片更加精美，吸引用户眼球</p>
+                    <span class="feature-badge" style="background: #43e97b;">点击率+60%</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #fa709a;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3 9V5C3 3.89543 3.89543 3 5 3H19C20.1046 3 21 3.89543 21 5V9" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 21V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M16 21V15" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>用户画像</h3>
+                    <p>深度分析用户偏好、购买习惯，精准推送个性化商品，提升复购率和客单价</p>
+                    <span class="feature-badge" style="background: #fa709a;">复购率+40%</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="feature-card scroll-animate" style="border-top: 4px solid #a8edea;">
+                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3>营销推送</h3>
+                    <p>智能上新提醒、促销活动推送、会员关怀，多维度触达用户，提升转化率</p>
+                    <span class="feature-badge" style="background: #a8edea; color: #333;">打开率+80%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 功能特色 -->
+    <section class="features-highlight">
+        <div class="container">
+            <h2 class="section-title scroll-animate">为什么选择我们</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="feature-highlight-card scroll-animate" style="background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; border-radius: 15px; overflow: hidden;">
+                        <div class="feature-highlight-icon" style="background: rgba(0,0,0,0.1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>高效快捷</h3>
+                        <p>AI一分钟可生成上百条不同风格文案，而人工一天仅能产出10-20条，效率提升500%以上</p>
+                        <button class="btn btn-dark btn-sm mt-3" style="border-radius: 20px; background: rgba(0,0,0,0.8); color: #ff9a9e;">了解更多</button>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-highlight-card scroll-animate" style="background: linear-gradient(135deg, #a8edea 0%, #d5fefd 100%); color: #333; border-radius: 15px; overflow: hidden;">
+                        <div class="feature-highlight-icon" style="background: rgba(0,0,0,0.1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2"/>
+                                <path d="M12 6V12L16 14" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>降低成本</h3>
+                        <p>中小服装店铺年省10万+运营费，设计/文案成本省15-20万，客服成本省8-9万</p>
+                        <button class="btn btn-dark btn-sm mt-3" style="border-radius: 20px; background: rgba(0,0,0,0.8); color: #a8edea;">了解更多</button>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="feature-highlight-card scroll-animate" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; overflow: hidden;">
+                        <div class="feature-highlight-icon" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M2 21L7 10L12 14L17 5L22 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3>提升转化</h3>
+                        <p>AI文案使服装类商品收藏加购率提升60%、退货率降低15%，标题优化后搜索曝光量提升120%</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #667eea;">了解更多</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 身份选择页面 -->
+    <section class="identity-section scroll-animate" id="identitySection" style="background: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0; margin: 0; width: 100%; flex: 1; position: relative; z-index: 1;">
+        <p style="text-align: center; margin-bottom: 60px; color: #666; font-size: 32px; font-weight: 300; max-width: 1200px; padding: 0 20px;">选择适合您的角色,开始体验服装电商智能体的强大功能</p>
+        <div class="identity-buttons" style="display: flex; justify-content: center; gap: 60px; max-width: 1000px; padding: 0 20px; width: 100%;">
+            <button class="btn identity-btn merchant-btn" onclick="showMerchantPage()" style="flex: 1; padding: 40px 30px; border: none; border-radius: 25px; background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; font-size: 32px; font-weight: 700; box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4); transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px;">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 20px;">
+                    <path d="M16 6V4c0-1.10457-0.895431-2-2-2H10C8.89543 2 8 2.89543 8 4V6M16 6C16 6 16.5 10 16.5 12C16.5 14 16 18 16 18H7.5C7.5 18 7 14 7 12C7 10 7.5 6 7.5 6H16Z" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3 6H21" stroke="#333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>商家</span>
+            </button>
+            <button class="btn identity-btn customer-btn" onclick="showCustomerPage()" style="flex: 1; padding: 40px 30px; border: none; border-radius: 25px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 32px; font-weight: 700; box-shadow: 0 8px 20px rgba(79, 172, 254, 0.4); transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px;">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 20px;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="7" r="4" stroke="white" stroke-width="2"/>
+                </svg>
+                <span>顾客</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 商家页面 -->
+    <section class="py-10" id="merchantPage" style="display: none; background: white; padding-top: 120px; padding-bottom: 180px;">
+        <a href="#" class="back-btn" onclick="showIdentityPage()" style="margin-left: 20px; color: #333; font-size: 20px;">← 返回身份选择</a>
+        <div class="container-fluid p-0">
+            <div class="row">
+                <div class="col-12" style="padding: 0;">
+                    <h2 class="section-title" style="text-align: center; margin-bottom: 60px; color: #333; font-size: 48px; font-weight: 700;">商家中心</h2>
+                    <div class="row" style="margin: 0;">
+                        <div class="col-md-6">
+                            <div class="feature-card" onclick="showContentCreation()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 60px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 400px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(102, 126, 234, 0.1); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
+                                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="#667eea" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 36px; font-weight: 700; margin-bottom: 25px;">内容创作</h3>
+                                <p style="font-size: 20px; margin-bottom: 40px;">包含标题优化、文案撰写、卖点提炼等功能</p>
+                                <button class="btn btn-light btn-sm mt-3" style="border-radius: 25px; background: #667eea; color: white; font-weight: 600; padding: 20px 40px; font-size: 24px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">立即体验</button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card" onclick="showDataAnalysis()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 60px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 400px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(240, 147, 251, 0.1); width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 30px;">
+                                    <svg width="50" height="50" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 21L7 10L12 14L17 5L22 12" stroke="#f5576c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 36px; font-weight: 700; margin-bottom: 25px;">数据分析</h3>
+                                <p style="font-size: 20px; margin-bottom: 40px;">包含爆款分析、上新建议、滞销品优化等功能</p>
+                                <button class="btn btn-light btn-sm mt-3" style="border-radius: 25px; background: #f5576c; color: white; font-weight: 600; padding: 20px 40px; font-size: 24px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">立即体验</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 顾客页面 -->
+    <section class="py-10" id="customerPage" style="display: none; background: white; padding-top: 120px; padding-bottom: 180px;">
+        <a href="#" class="back-btn" onclick="showIdentityPage()" style="margin-left: 20px; color: #333; font-size: 20px;">← 返回身份选择</a>
+        <div class="container-fluid p-0">
+            <div class="row">
+                <div class="col-12" style="padding: 0;">
+                    <h2 class="section-title" style="text-align: center; margin-bottom: 60px; color: #333; font-size: 48px; font-weight: 700;">顾客中心</h2>
+                    <div class="row" style="margin: 0;">
+                        <div class="col-md-3">
+                            <div class="feature-card" onclick="showBasicInquiry()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 350px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(79, 172, 254, 0.1); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="10" stroke="#4facfe" stroke-width="2"/>
+                                        <path d="M12 16V12" stroke="#4facfe" stroke-width="2" stroke-linecap="round"/>
+                                        <path d="M12 8H12.01" stroke="#4facfe" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 30px; font-weight: 700; margin-bottom: 20px;">基础问询</h3>
+                                <p style="font-size: 18px; margin-bottom: 30px;">咨询商品信息、尺码、面料等问题</p>
+                                <button class="btn btn-light btn-sm mt-3" style="border-radius: 25px; background: #4facfe; color: white; font-weight: 600; padding: 18px 32px; font-size: 22px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">立即咨询</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-card" onclick="showAfterSales()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 350px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(168, 237, 234, 0.1); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="#a8edea" stroke-width="2"/>
+                                        <path d="M12 15C12 15 15 21 15 21H9C9 21 12 15 12 15Z" stroke="#a8edea" stroke-width="2"/>
+                                        <path d="M12 9C13.6569 9 15 7.65685 15 6C15 4.34315 13.6569 3 12 3C10.3431 3 9 4.34315 9 6C9 7.65685 10.3431 9 12 9Z" stroke="#a8edea" stroke-width="2"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 30px; font-weight: 700; margin-bottom: 20px;">售后处理</h3>
+                                <p style="font-size: 18px; margin-bottom: 30px;">处理退换货、退款等问题</p>
+                                <button class="btn btn-dark btn-sm mt-3" style="border-radius: 25px; background: #a8edea; color: #333; font-weight: 600; padding: 18px 32px; font-size: 22px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">立即处理</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-card" onclick="showNotifications()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 350px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(252, 182, 159, 0.1); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke="#fcb69f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 30px; font-weight: 700; margin-bottom: 20px;">通知</h3>
+                                <p style="font-size: 18px; margin-bottom: 30px;">查看上新通知、会员折扣提醒等</p>
+                                <button class="btn btn-dark btn-sm mt-3" style="border-radius: 25px; background: #fcb69f; color: #333; font-weight: 600; padding: 18px 32px; font-size: 22px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">查看通知</button>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="feature-card" onclick="showOtherCustomer()" style="background: white; color: #333; border: 2px solid #e0e0e0; border-radius: 20px; overflow: hidden; padding: 40px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); min-height: 350px;">
+                                <div class="feature-icon-wrapper" style="background: rgba(245, 87, 108, 0.1); width: 90px; height: 90px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 25px;">
+                                    <svg width="45" height="45" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="12" cy="12" r="1" fill="#f5576c"/>
+                                        <circle cx="19" cy="12" r="1" fill="#f5576c"/>
+                                        <circle cx="5" cy="12" r="1" fill="#f5576c"/>
+                                    </svg>
+                                </div>
+                                <h3 style="font-size: 30px; font-weight: 700; margin-bottom: 20px;">其他</h3>
+                                <p style="font-size: 18px; margin-bottom: 30px;">其他相关问题咨询</p>
+                                <button class="btn btn-light btn-sm mt-3" style="border-radius: 25px; background: #f5576c; color: white; font-weight: 600; padding: 18px 32px; font-size: 22px; width: 100%; display: flex; align-items: center; justify-content: center; line-height: 1;">立即咨询</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 内容创作页面 -->
+    <section class="py-10 bg-light" id="contentCreationPage" style="display: none;">
+        <a href="#" class="back-btn" onclick="showMerchantPage()">← 返回商家中心</a>
+        <div class="container">
+            <h2 class="section-title">内容创作</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showTitleOptimization()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <line x1="7" y1="7" x2="7.01" y2="7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">标题优化</h3>
+                        <p style="font-size: 16px;">优化商品标题，提高搜索曝光量</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #667eea; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始优化</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showCopywriting()" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">文案撰写</h3>
+                        <p style="font-size: 16px;">撰写商品文案，提高转化率</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #f5576c; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始撰写</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showSellingPoints()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">卖点提炼</h3>
+                        <p style="font-size: 16px;">提炼商品核心卖点，吸引消费者</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #4facfe; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始提炼</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showOtherContent()" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(0,0,0,0.1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="1" fill="black"/>
+                                <circle cx="19" cy="12" r="1" fill="black"/>
+                                <circle cx="5" cy="12" r="1" fill="black"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">其他</h3>
+                        <p style="font-size: 16px;">其他内容创作需求</p>
+                        <button class="btn btn-dark btn-sm mt-3" style="border-radius: 20px; background: rgba(0,0,0,0.8); color: #a8edea; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始创作</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 数据分析页面 -->
+    <section class="py-10 bg-white" id="dataAnalysisPage" style="display: none;">
+        <a href="#" class="back-btn" onclick="showMerchantPage()">← 返回商家中心</a>
+        <div class="container">
+            <h2 class="section-title">数据分析</h2>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showBestsellerAnalysis()" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(0,0,0,0.1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19.4 15C19.21 15.45 19.08 15.92 19 16.4C18.41 16.26 17.79 16.18 17.14 16.18C15.5 16.18 14.12 16.86 13.43 18.03C13.32 18.22 13.24 18.42 13.19 18.64C13.14 18.85 13.14 19.08 13.19 19.29C13.24 19.5 13.34 19.7 13.46 19.87C13.58 20.05 13.73 20.19 13.9 20.3C14.07 20.42 14.25 20.49 14.44 20.52C14.63 20.54 14.82 20.54 15 20.5C15.48 20.43 15.93 20.21 16.25 19.87C16.58 19.54 16.8 19.08 16.9 18.58C16.99 18.08 16.99 17.55 16.9 17.05C16.83 16.68 16.71 16.34 16.57 16.03C16.43 15.73 16.27 15.46 16.08 15.23C15.9 15 15.69 14.81 15.45 14.65C15.22 14.49 14.97 14.38 14.7 14.32C14.43 14.26 14.15 14.26 13.88 14.32C13.61 14.38 13.36 14.49 13.13 14.65C12.9 14.81 12.7 15 12.52 15.23C12.33 15.46 12.17 15.73 12.03 16.03C11.9 16.34 11.77 16.68 11.7 17.05C11.6 17.55 11.6 18.08 11.7 18.58C11.8 19.08 12.01 19.54 12.34 19.87C12.67 20.21 13.12 20.43 13.6 20.5C13.78 20.54 13.97 20.54 14.16 20.52C14.35 20.49 14.53 20.42 14.7 20.3C14.87 20.19 15.02 20.05 15.14 19.87C15.26 19.7 15.36 19.5 15.41 19.29C15.46 19.08 15.46 18.85 15.41 18.64C15.36 18.42 15.28 18.22 15.17 18.03C14.48 16.86 13.1 16.18 11.46 16.18C10.81 16.18 10.19 16.26 9.6 16.4C9.46 15.92 9.33 15.45 9.15 15C8.29 13.36 7.5 11.5 7.5 9.5C7.5 7.01 9.51 5 12 5C14.49 5 16.5 7.01 16.5 9.5C16.5 11.5 15.71 13.36 14.85 15H19.4Z" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">爆款分析</h3>
+                        <p style="font-size: 16px;">分析爆款商品的核心原因</p>
+                        <button class="btn btn-dark btn-sm mt-3" style="border-radius: 20px; background: rgba(0,0,0,0.8); color: #fcb69f; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始分析</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showNewProductSuggestion()" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(0,0,0,0.1);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" stroke="black" stroke-width="2"/>
+                                <path d="M12 8V16" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M8 12H16" stroke="black" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">上新建议</h3>
+                        <p style="font-size: 16px;">根据趋势推荐上新品类</p>
+                        <button class="btn btn-dark btn-sm mt-3" style="border-radius: 20px; background: rgba(0,0,0,0.8); color: #a8edea; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">查看建议</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showSlowMovingOptimization()" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="2"/>
+                                <path d="M12 22V12" stroke="white" stroke-width="2"/>
+                                <path d="M12 12C14.2091 12 16 10.2091 16 8" stroke="white" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">滞销品优化</h3>
+                        <p style="font-size: 16px;">针对滞销商品给出优化建议</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #4facfe; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始优化</button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="feature-card" onclick="showOtherAnalysis()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; overflow: hidden; text-align: center; padding: 30px;">
+                        <div class="feature-icon-wrapper" style="background: rgba(255,255,255,0.2);">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="1" fill="white"/>
+                                <circle cx="19" cy="12" r="1" fill="white"/>
+                                <circle cx="5" cy="12" r="1" fill="white"/>
+                            </svg>
+                        </div>
+                        <h3 style="font-size: 22px; font-weight: 600;">其他</h3>
+                        <p style="font-size: 16px;">其他数据分析需求</p>
+                        <button class="btn btn-light btn-sm mt-3" style="border-radius: 20px; background: rgba(255,255,255,0.9); color: #667eea; font-size: 18px; font-weight: 600; display: inline-block; text-align: center; padding: 10px 20px; margin: 0 auto;">开始分析</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AI对话页面 -->
+    <section class="py-10 bg-white" id="chatPage" style="display: none;">
+        <a href="#" class="back-btn" id="chatBackBtn">← 返回</a>
+        <div class="container">
+            <h2 class="section-title" id="chatTitle">AI对话</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">AI助手</h3>
+                            <div class="chat-container" id="chatContainer">
+                                <div class="message bot-message">
+                                    <p>您好！我是服装电商智能助手，有什么可以帮助您的吗？</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="userInput" placeholder="请输入您的问题...">
+                                    <button class="btn btn-primary" id="sendBtn">发送</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">示例问题</h3>
+                            <div id="aiExamples"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 通知页面 -->
+    <section class="py-10 bg-light" id="notificationsPage" style="display: none;">
+        <a href="#" class="back-btn" onclick="showCustomerPage()">← 返回顾客中心</a>
+        <div class="container">
+            <h2 class="section-title">通知中心</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">老客户上新通知</h3>
+                            <div class="ai-example">
+                                <h4>法式雪纺连衣裙上新</h4>
+                                <p>亲爱的会员，我们的法式雪纺连衣裙系列已全新上线，多种颜色可选，限时8折优惠，快来选购吧！</p>
+                            </div>
+                            <div class="ai-example">
+                                <h4>微喇牛仔裤新品</h4>
+                                <p>亲爱的会员，我们的微喇牛仔裤系列已全新上线，适合梨形身材，显瘦显腿长，限时7折优惠，快来选购吧！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="card-title">会员折扣提醒</h3>
+                            <div class="ai-example">
+                                <h4>银卡会员专享</h4>
+                                <p>亲爱的银卡会员，本月15号会员日，全场商品95折，还有专属礼品等你拿！</p>
+                            </div>
+                            <div class="ai-example">
+                                <h4>金卡会员专享</h4>
+                                <p>亲爱的金卡会员，本月15号会员日，全场商品9折，还有专属礼品和优先发货权益！</p>
+                            </div>
+                            <div class="ai-example">
+                                <h4>钻石会员专享</h4>
+                                <p>亲爱的钻石会员，本月15号会员日，全场商品85折，还有专属礼品、优先发货和专属客服权益！</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 关于我们 -->
+    <section class="about-section" id="about">
+        <div class="container">
+            <h2 class="section-title scroll-animate">关于我们</h2>
+            <p class="text-center text-muted mb-5" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">我们是一支充满激情的大学生创业团队，致力于用AI技术赋能服装电商行业</p>
+            
+            <div class="about-content scroll-animate">
+                <div class="about-text">
+                    <h3>我们的使命</h3>
+                    <p>作为一支来自高校的大学生创业团队，我们深知中小服装电商在运营中面临的挑战。我们的使命是通过先进的AI技术，帮助服装商家降低运营成本、提升工作效率，让每一家服装店铺都能享受到智能化带来的便利。</p>
+                    <p>我们相信，科技应该服务于人。通过我们的智能体系统，商家可以专注于产品和服务的提升，而繁琐的文案撰写、数据分析等工作交给AI来完成。</p>
+                    
+                    <a href="#features" class="btn btn-primary btn-lg mt-4" style="border-radius: 50px; padding: 1rem 2.5rem;">
+                        <i class="fas fa-rocket"></i> 了解更多
+                    </a>
+                </div>
+                <div class="about-image">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop" alt="团队协作">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-6">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 mb-4">
+                    <h4><i class="fas fa-magic"></i> 服装电商智能体</h4>
+                    <p>为服装电商提供全方位的智能解决方案,助力商家提升运营效率,为顾客提供优质服务</p>
+                    <div class="mt-3">
+                        <a href="#" class="text-white me-3"><i class="fab fa-weixin fa-2x"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-weibo fa-2x"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-tiktok fa-2x"></i></a>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <h4><i class="fas fa-envelope"></i> 联系我们</h4>
+                    <p><i class="fas fa-phone"></i> 联系电话：19867868382</p>
+                    <p><i class="fas fa-envelope"></i> 邮箱：service@fashionai.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> 地址：华南农业大学</p>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.2);">
+            <div class="row mt-4">
+                <div class="col-md-12 text-center">
+                    <p>&copy; 2026 服装电商智能体.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 智能客服功能
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+
+            // 发送消息
+            function sendMessage() {
+                const message = userInput.value.trim();
+                if (message) {
+                    // 添加用户消息
+                    addMessage('user', message);
+                    // 清空输入框
+                    userInput.value = '';
+                    // 显示AI正在思考
+                    const thinkingId = addMessage('bot', '<i class="fas fa-spinner fa-spin"></i> 正在思考...');
+                    // 调用后端API获取AI回复
+                    fetch('http://localhost:5000/api/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ query: message })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // 移除思考消息
+                        removeMessage(thinkingId);
+                        // 添加AI回复
+                        addMessage('bot', data.answer);
+                    })
+                    .catch(error => {
+                        // 移除思考消息
+                        removeMessage(thinkingId);
+                        // 添加错误消息
+                        addMessage('bot', '❌ 抱歉，服务暂时不可用，请稍后再试。');
+                        console.error('API调用失败:', error);
+                    });
+                }
+            }
+
+            // 添加消息到聊天窗口
+            function addMessage(type, text) {
+                const messageDiv = document.createElement('div');
+                const messageId = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                messageDiv.id = messageId;
+                messageDiv.className = `message ${type}-message`;
+                messageDiv.innerHTML = `<p>${text}</p>`;
+                chatContainer.appendChild(messageDiv);
+                // 滚动到底部
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                return messageId;
+            }
+
+            // 移除消息
+            function removeMessage(id) {
+                const messageDiv = document.getElementById(id);
+                if (messageDiv) {
+                    chatContainer.removeChild(messageDiv);
+                }
+            }
+
+            // 绑定发送按钮点击事件
+            sendBtn.addEventListener('click', sendMessage);
+
+            // 绑定回车键发送
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // 导航栏滚动效果
+            const navbar = document.querySelector('.navbar');
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // 滚动动画
+            const scrollElements = document.querySelectorAll('.scroll-animate');
+            
+            const elementInView = (el, dividend = 1) => {
+                const elementTop = el.getBoundingClientRect().top;
+                return (
+                    elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+                );
+            };
+            
+            const displayScrollElement = (element) => {
+                element.classList.add('show');
+            };
+            
+            const handleScrollAnimation = () => {
+                scrollElements.forEach((el) => {
+                    if (elementInView(el, 1.2)) {
+                        displayScrollElement(el);
+                    }
+                });
+            };
+            
+            // 初始检查
+            handleScrollAnimation();
+            
+            // 滚动时检查
+            window.addEventListener('scroll', () => {
+                handleScrollAnimation();
+            });
+        });
+
+        // 页面切换函数
+        
+        // 显示完整首页
+        function showHomePage() {
+            // 显示首页所有section
+            document.querySelector('.header').style.display = 'flex';
+            document.getElementById('features').style.display = 'block';
+            document.querySelector('.features-highlight').style.display = 'block';
+            document.getElementById('about').style.display = 'block';
+            document.getElementById('identitySection').style.display = 'flex';
+            
+            // 隐藏所有功能页面
+            document.getElementById('merchantPage').style.display = 'none';
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'none';
+            document.getElementById('notificationsPage').style.display = 'none';
+            
+            // 滚动到页面顶部
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+        
+        function showIdentityPage() {
+            // 隐藏首页其他section
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('features').style.display = 'none';
+            document.querySelector('.features-highlight').style.display = 'none';
+            document.getElementById('about').style.display = 'none';
+            
+            document.getElementById('identitySection').style.display = 'flex';
+            document.getElementById('merchantPage').style.display = 'none';
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'none';
+            document.getElementById('notificationsPage').style.display = 'none';
+            
+            // 滚动到页面顶部
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function showMerchantPage() {
+            // 隐藏首页其他section
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('features').style.display = 'none';
+            document.querySelector('.features-highlight').style.display = 'none';
+            document.getElementById('about').style.display = 'none';
+            
+            document.getElementById('identitySection').style.display = 'none';
+            document.getElementById('merchantPage').style.display = 'block';
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'none';
+            document.getElementById('notificationsPage').style.display = 'none';
+            
+            // 滚动到页面顶部
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function showCustomerPage() {
+            // 隐藏首页其他section
+            document.querySelector('.header').style.display = 'none';
+            document.getElementById('features').style.display = 'none';
+            document.querySelector('.features-highlight').style.display = 'none';
+            document.getElementById('about').style.display = 'none';
+            
+            document.getElementById('identitySection').style.display = 'none';
+            document.getElementById('merchantPage').style.display = 'none';
+            document.getElementById('customerPage').style.display = 'block';
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'none';
+            document.getElementById('notificationsPage').style.display = 'none';
+            
+            // 滚动到页面顶部
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function showContentCreation() {
+            document.getElementById('merchantPage').style.display = 'none';
+            document.getElementById('contentCreationPage').style.display = 'block';
+        }
+
+        function showDataAnalysis() {
+            document.getElementById('merchantPage').style.display = 'none';
+            document.getElementById('dataAnalysisPage').style.display = 'block';
+        }
+
+        function showBasicInquiry() {
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '基础问询';
+            document.getElementById('chatBackBtn').onclick = showCustomerPage;
+            showAIExamples('basic');
+        }
+
+        function showAfterSales() {
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '售后处理';
+            document.getElementById('chatBackBtn').onclick = showCustomerPage;
+            showAIExamples('afterSales');
+        }
+
+        function showNotifications() {
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('notificationsPage').style.display = 'block';
+        }
+
+        function showOtherCustomer() {
+            document.getElementById('customerPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '其他问题';
+            document.getElementById('chatBackBtn').onclick = showCustomerPage;
+            showAIExamples('otherCustomer');
+        }
+
+        function showTitleOptimization() {
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '标题优化';
+            document.getElementById('chatBackBtn').onclick = showContentCreation;
+            showAIExamples('title');
+        }
+
+        function showCopywriting() {
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '文案撰写';
+            document.getElementById('chatBackBtn').onclick = showContentCreation;
+            showAIExamples('copywriting');
+        }
+
+        function showSellingPoints() {
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '卖点提炼';
+            document.getElementById('chatBackBtn').onclick = showContentCreation;
+            showAIExamples('sellingPoints');
+        }
+
+        function showOtherContent() {
+            document.getElementById('contentCreationPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '其他内容创作';
+            document.getElementById('chatBackBtn').onclick = showContentCreation;
+            showAIExamples('otherContent');
+        }
+
+        function showBestsellerAnalysis() {
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '爆款分析';
+            document.getElementById('chatBackBtn').onclick = showDataAnalysis;
+            showAIExamples('bestseller');
+        }
+
+        function showNewProductSuggestion() {
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '上新建议';
+            document.getElementById('chatBackBtn').onclick = showDataAnalysis;
+            showAIExamples('newProduct');
+        }
+
+        function showSlowMovingOptimization() {
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '滞销品优化';
+            document.getElementById('chatBackBtn').onclick = showDataAnalysis;
+            showAIExamples('slowMoving');
+        }
+
+        function showOtherAnalysis() {
+            document.getElementById('dataAnalysisPage').style.display = 'none';
+            document.getElementById('chatPage').style.display = 'block';
+            document.getElementById('chatTitle').textContent = '其他数据分析';
+            document.getElementById('chatBackBtn').onclick = showDataAnalysis;
+            showAIExamples('otherAnalysis');
+        }
+
+        // 显示AI示例问题
+        function showAIExamples(type) {
+            const aiExamples = document.getElementById('aiExamples');
+            let examples = '';
+
+            switch(type) {
+                case 'basic':
+                    examples = `
+                        <div class="ai-example">
+                            <p>160cm/90斤穿什么码？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>雪纺面料容易勾丝吗？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>纯棉T恤可以机洗吗？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>发货时间是多久？</p>
+                        </div>
+                    `;
+                    break;
+                case 'afterSales':
+                    examples = `
+                        <div class="ai-example">
+                            <p>如何申请退换货？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>商品质量问题可以退货吗？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>退换货的运费由谁承担？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>退款什么时候到账？</p>
+                        </div>
+                    `;
+                    break;
+                case 'otherCustomer':
+                    examples = `
+                        <div class="ai-example">
+                            <p>店铺有哪些优惠活动？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何成为会员？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>会员有哪些权益？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>可以开发票吗？</p>
+                        </div>
+                    `;
+                    break;
+                case 'title':
+                    examples = `
+                        <div class="ai-example">
+                            <p>帮我优化法式雪纺连衣裙的标题</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>微喇牛仔裤的标题怎么优化？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何让标题更有搜索量？</p>
+                        </div>
+                    `;
+                    break;
+                case 'copywriting':
+                    examples = `
+                        <div class="ai-example">
+                            <p>帮我撰写法式雪纺连衣裙的文案</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>微喇牛仔裤的文案怎么写？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何让文案更吸引人？</p>
+                        </div>
+                    `;
+                    break;
+                case 'sellingPoints':
+                    examples = `
+                        <div class="ai-example">
+                            <p>帮我提炼法式雪纺连衣裙的核心卖点</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>微喇牛仔裤的核心卖点是什么？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何突出商品的独特优势？</p>
+                        </div>
+                    `;
+                    break;
+                case 'otherContent':
+                    examples = `
+                        <div class="ai-example">
+                            <p>帮我设计商品详情页的结构</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何撰写商品描述？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>帮我设计促销活动的文案</p>
+                        </div>
+                    `;
+                    break;
+                case 'bestseller':
+                    examples = `
+                        <div class="ai-example">
+                            <p>帮我分析法式雪纺连衣裙成为爆款的原因</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何打造爆款商品？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>爆款商品的共同特征是什么？</p>
+                        </div>
+                    `;
+                    break;
+                case 'newProduct':
+                    examples = `
+                        <div class="ai-example">
+                            <p>今年夏季流行什么款式的服装？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>针对年轻女性，我应该上什么新品？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何预测下一季的流行趋势？</p>
+                        </div>
+                    `;
+                    break;
+                case 'slowMoving':
+                    examples = `
+                        <div class="ai-example">
+                            <p>我的纯棉T恤销量不好，如何优化？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>滞销商品的处理方法有哪些？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何避免商品滞销？</p>
+                        </div>
+                    `;
+                    break;
+                case 'otherAnalysis':
+                    examples = `
+                        <div class="ai-example">
+                            <p>如何分析店铺的销售数据？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何提高店铺的转化率？</p>
+                        </div>
+                        <div class="ai-example">
+                            <p>如何分析竞争对手的商品？</p>
+                        </div>
+                    `;
+                    break;
+                default:
+                    examples = `
+                        <div class="ai-example">
+                            <p>有什么可以帮助您的？</p>
+                        </div>
+                    `;
+            }
+
+            aiExamples.innerHTML = examples;
+
+            // 绑定示例问题点击事件
+            const exampleElements = aiExamples.querySelectorAll('.ai-example');
+            exampleElements.forEach(element => {
+                element.addEventListener('click', function() {
+                    const question = this.querySelector('p').textContent;
+                    document.getElementById('userInput').value = question;
+                });
+            });
+        }
+    </script>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 服装电商智能体. 保留所有权利.</p>
+            <div class="footer-links">
+                <a href="#">关于我们</a>
+                <a href="#">使用指南</a>
+                <a href="#">联系我们</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
