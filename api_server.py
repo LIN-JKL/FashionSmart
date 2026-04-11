@@ -1,9 +1,17 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-from langchain.vectorstores import Chroma
-from langchain.embeddings.dashscope import DashScopeEmbeddings
-import openai
+from openai import OpenAI
+import re
+
+# Try to import vectorstore dependencies
+try:
+    from langchain.vectorstores import Chroma
+    from langchain_community.embeddings import DashScopeEmbeddings
+    VECTORSTORE_AVAILABLE = True
+except ImportError:
+    print("Warning: Vectorstore dependencies not available. Using fallback mode.")
+    VECTORSTORE_AVAILABLE = False
 
 # 配置项
 CHROMA_DB_PATH = r"d:\创新创业作业\服装向量库"
@@ -15,13 +23,21 @@ app = Flask(__name__)
 CORS(app)  # 允许跨域请求
 
 # 初始化向量库
-os.environ["DASHSCOPE_API_KEY"] = DASHSCOPE_API_KEY
-embeddings = DashScopeEmbeddings(model="text-embedding-v1")
-try:
-    db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=embeddings)
-except Exception as e:
-    print(f"警告：无法加载向量库，将使用默认回答: {str(e)}")
-    db = None
+db = None
+if VECTORSTORE_AVAILABLE:
+    os.environ["DASHSCOPE_API_KEY"] = DASHSCOPE_API_KEY
+    try:
+        # 使用通义千问的embedding模型
+        embeddings = DashScopeEmbeddings(model="text-embedding-v1", dashscope_api_key=DASHSCOPE_API_KEY)
+        # 加载现有的向量库
+        db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=embeddings)
+        print("Vector database loaded successfully")
+    except Exception as e:
+        print(f"Warning: Failed to load vector database: {e}")
+        print("Continuing without vector database...")
+        db = None
+else:
+    print("Vectorstore dependencies not available. Using fallback mode.")
 
 # 智能体回答函数
 def fashion_agent_answer(query, db):
