@@ -17,13 +17,24 @@ CORS(app)  # 允许跨域请求
 # 初始化向量库
 os.environ["DASHSCOPE_API_KEY"] = DASHSCOPE_API_KEY
 embeddings = DashScopeEmbeddings(model="text-embedding-v1")
-db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=embeddings)
+try:
+    db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=embeddings)
+except Exception as e:
+    print(f"警告：无法加载向量库，将使用默认回答: {str(e)}")
+    db = None
 
 # 智能体回答函数
 def fashion_agent_answer(query, db):
     # 从RAG知识库检索最相关的内容
-    docs = db.similarity_search(query, k=2)
-    context = "\n".join([doc.page_content for doc in docs])
+    if db is not None:
+        try:
+            docs = db.similarity_search(query, k=2)
+            context = "\n".join([doc.page_content for doc in docs])
+        except Exception as e:
+            print(f"警告：向量库检索失败，将使用默认回答: {str(e)}")
+            context = "服装行业相关知识"
+    else:
+        context = "服装行业相关知识"
     
     # 构建消息
     messages = [
