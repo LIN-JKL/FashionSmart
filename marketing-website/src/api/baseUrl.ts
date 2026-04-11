@@ -23,5 +23,5 @@ export function getApiBaseUrl(): string {
     }
   }
   // 默认返回后端服务URL
-  return 'https://cucumber-disease-detection.onrender.com/api'
+  return 'https://fashionsmart-backend.onrender.com/api'
 }
