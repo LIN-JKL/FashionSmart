@@ -6,7 +6,7 @@ from langchain.embeddings.dashscope import DashScopeEmbeddings
 import openai
 
 # 配置项
-CHROMA_DB_PATH = r"d:\创新创业作业\服装向量库\"
+CHROMA_DB_PATH = r"d:\创新创业作业\服装向量库"
 DASHSCOPE_API_KEY = "sk-049dcb5f22624096b7549c2d2756e45d"
 DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
