@@ -50,14 +50,14 @@ export async function sendAIChatMessage(
     const latestUserMessage = [...messages].reverse().find(item => item.role === 'user')?.content || '';
     
     // 新代码的Axios请求写法（规范TS类型 + 修复原response.response错误）
-    const response: AxiosResponse = await aiApi.post('/ai/chat', {
-      message: latestUserMessage, // 保留原有接口参数名
+    const response: AxiosResponse = await aiApi.post('/chat', {
+      query: latestUserMessage, // 适配后端API参数名
     });
 
     // 修复核心错误：用response.data替代原response.response
     return {
       success: true,
-      content: response.data.response || '', // 适配原有接口返回结构（data里的response字段）
+      content: response.data.answer || '', // 适配后端API返回结构
     };
   } catch (error) {
     // 整合新代码的精细化错误处理
@@ -102,21 +102,21 @@ export async function sendAIChatMessageStream(
 ): Promise<void> {
   try {
     const latestUserMessage = [...messages].reverse().find(item => item.role === 'user')?.content || '';
-    const response = await fetch(`${getApiBaseUrl()}/ai/chat`, {
+    const response = await fetch(`${getApiBaseUrl()}/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: latestUserMessage }),
+      body: JSON.stringify({ query: latestUserMessage }),
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error?.message || '请求失败');
+      throw new Error(errorData.error || '请求失败');
     }
 
     const data = await response.json();
-    onMessage(data.response || '');
+    onMessage(data.answer || '');
     onComplete();
   } catch (error) {
     console.error('流式AI咨询请求失败:', error);
