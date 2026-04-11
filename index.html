@@ -1879,7 +1879,7 @@
                     // 显示AI正在思考
                     const thinkingId = addMessage('bot', '<i class="fas fa-spinner fa-spin"></i> 正在思考...');
                     // 调用后端API获取AI回复
-                    fetch('http://localhost:5000/api/chat', {
+                    fetch('https://fashionsmart-backend.onrender.com/api/chat', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
