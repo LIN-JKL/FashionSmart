@@ -19,11 +19,11 @@ def fashion_agent_answer(query):
     ]
     
     # 调用通义千问大模型生成回复（使用OpenAI兼容API）
-    client = openai.OpenAI(
-        api_key=DASHSCOPE_API_KEY,
-        base_url=DASHSCOPE_BASE_URL
-    )
     try:
+        client = openai.OpenAI(
+            api_key=DASHSCOPE_API_KEY,
+            base_url=DASHSCOPE_BASE_URL
+        )
         response = client.chat.completions.create(
             model="qwen-turbo",
             messages=messages,
@@ -57,6 +57,7 @@ def fashion_agent_answer(query):
         
         return answer
     except Exception as e:
+        print(f"Error in fashion_agent_answer: {str(e)}")
         return f"❌ 回答失败：{str(e)}"
 
 # API端点
