@@ -1,1 +1,1 @@
-web: python minimal_api.py
+web: python basic_api.py
