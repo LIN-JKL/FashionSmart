@@ -77,14 +77,18 @@ def fashion_agent_answer(query, db):
 # API端点
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
-    query = data.get('query', '')
-    if not query:
-        return jsonify({"error": "请输入问题"}), 400
-    
-    # 获取AI回答
-    answer = fashion_agent_answer(query, db)
-    return jsonify({"answer": answer})
+    try:
+        data = request.json
+        query = data.get('query', '')
+        if not query:
+            return jsonify({"error": "请输入问题"}), 400
+        
+        # 获取AI回答
+        answer = fashion_agent_answer(query, db)
+        return jsonify({"answer": answer})
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({"error": f"服务器内部错误: {str(e)}"}), 500
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])
