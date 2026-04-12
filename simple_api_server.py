@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import openai
+import traceback
 
 # 配置项
 DASHSCOPE_API_KEY = "sk-049dcb5f22624096b7549c2d2756e45d"
@@ -8,28 +9,33 @@ DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 
 # 初始化Flask应用
 app = Flask(__name__)
-CORS(app)  # 允许跨域请求
+# 明确配置CORS，允许所有来源
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # 智能体回答函数
 def fashion_agent_answer(query):
-    # 构建消息
-    messages = [
-        {"role": "system", "content": "你是一名专业的服装电商运营智能体，回答要贴合电商场景，简洁实用。"},
-        {"role": "user", "content": query}
-    ]
-    
-    # 调用通义千问大模型生成回复（使用OpenAI兼容API）
     try:
+        # 构建消息
+        messages = [
+            {"role": "system", "content": "你是一名专业的服装电商运营智能体，回答要贴合电商场景，简洁实用。"},
+            {"role": "user", "content": query}
+        ]
+        
+        # 调用通义千问大模型生成回复（使用OpenAI兼容API）
         client = openai.OpenAI(
             api_key=DASHSCOPE_API_KEY,
             base_url=DASHSCOPE_BASE_URL
         )
+        
+        print("Making API call to OpenAI...")
         response = client.chat.completions.create(
             model="qwen-turbo",
             messages=messages,
             max_tokens=512,
             temperature=0.7
         )
+        print("API call successful")
+        
         # 处理回答格式
         answer = response.choices[0].message.content
         # 移除*、#、-等符号
@@ -58,19 +64,32 @@ def fashion_agent_answer(query):
         return answer
     except Exception as e:
         print(f"Error in fashion_agent_answer: {str(e)}")
+        print(traceback.format_exc())
         return f"❌ 回答失败：{str(e)}"
 
 # API端点
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    data = request.json
-    query = data.get('query', '')
-    if not query:
-        return jsonify({"error": "请输入问题"}), 400
-    
-    # 获取AI回答
-    answer = fashion_agent_answer(query)
-    return jsonify({"answer": answer})
+    try:
+        print("Received chat request")
+        data = request.json
+        print(f"Request data: {data}")
+        
+        if not data:
+            return jsonify({"error": "请求数据为空"}), 400
+        
+        query = data.get('query', '')
+        if not query:
+            return jsonify({"error": "请输入问题"}), 400
+        
+        # 获取AI回答
+        answer = fashion_agent_answer(query)
+        print(f"Generated answer: {answer}")
+        return jsonify({"answer": answer})
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({"error": "服务器内部错误"}), 500
 
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])
