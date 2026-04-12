@@ -1,7 +1,2 @@
 Flask
 Flask-CORS
-langchain
-langchain-community
-openai
-chromadb
-dashscope
