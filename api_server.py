@@ -59,10 +59,12 @@ def fashion_agent_answer(query, db):
     ]
     
     # 调用通义千问大模型生成回复（使用OpenAI兼容API）
-    openai.api_key = DASHSCOPE_API_KEY
-    openai.base_url = DASHSCOPE_BASE_URL
     try:
-        response = openai.ChatCompletion.create(
+        client = OpenAI(
+            api_key=DASHSCOPE_API_KEY,
+            base_url=DASHSCOPE_BASE_URL
+        )
+        response = client.chat.completions.create(
             model="qwen-turbo",
             messages=messages,
             max_tokens=512,
