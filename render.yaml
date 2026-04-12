@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: fashionsmart-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python simple_http_server.py
+    envVars:
+      - key: PORT
+        value: 5000
