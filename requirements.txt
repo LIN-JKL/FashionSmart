@@ -1,9 +1,2 @@
 Flask
 Flask-CORS
-openai
-langchain
-langchain-community
-chromadb
-pydantic
-pydantic-settings
-requests
