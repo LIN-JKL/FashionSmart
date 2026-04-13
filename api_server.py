@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import os
 
 app = FastAPI()
@@ -13,6 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 定义请求模型
+class ChatRequest(BaseModel):
+    query: str
+
 @app.get('/')
 def home():
     return {"message": "Hello World"}
@@ -22,8 +27,8 @@ def health():
     return {"status": "ok"}
 
 @app.post('/api/chat')
-def chat(query: str = Body(..., embed=True)):
-    return {"answer": f"收到：{query}"}
+def chat(request: ChatRequest):
+    return {"answer": f"收到：{request.query}"}
 
 if __name__ == '__main__':
     import uvicorn
