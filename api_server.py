@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 import logging
 import os
 
@@ -19,9 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class ChatRequest(BaseModel):
-    query: str
-
 @app.get("/")
 async def home():
     logger.info("Root endpoint called")
@@ -32,11 +28,11 @@ async def health():
     return {"status": "ok"}
 
 @app.post("/api/chat")
-async def chat(request: ChatRequest):
-    logger.info(f"Chat request received: {request.query}")
+async def chat(payload: dict = Body(...)):
+    logger.info(f"Chat request received: {payload}")
     try:
-        # 你的业务逻辑
-        response = {"answer": f"收到：{request.query}"}
+        query = payload.get('query', '')
+        response = {"answer": f"收到：{query}"}
         return response
     except Exception as e:
         logger.error(f"Error processing chat: {e}")
