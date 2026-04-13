@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 import os
 
@@ -22,7 +22,7 @@ def health():
     return {"status": "ok"}
 
 @app.post('/api/chat')
-def chat(query: str):
+def chat(query: str = Body(..., embed=True)):
     return {"answer": f"收到：{query}"}
 
 if __name__ == '__main__':
