@@ -3,8 +3,8 @@ services:
     name: fashionsmart-backend
     env: python
     plan: free
-    buildCommand: echo "No dependencies to install"
-    startCommand: python single_endpoint_server.py
+    buildCommand: pip install -r requirements.txt
+    startCommand: python flask_simple_server.py
     envVars:
       - key: PORT
         value: 5000
