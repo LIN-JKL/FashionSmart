@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Body
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import os
+import json
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -29,11 +30,20 @@ async def health():
     return {"status": "ok"}
 
 @app.post("/api/chat")
-async def chat(payload: dict):
-    logger.info(f"Chat endpoint called with payload: {payload}")
+async def chat(request: Request):
+    logger.info("Chat endpoint called")
     try:
+        # 直接从请求体读取数据
+        body = await request.body()
+        logger.info(f"Raw body: {body}")
+        
+        # 解析JSON
+        payload = json.loads(body)
+        logger.info(f"Parsed payload: {payload}")
+        
         query = payload.get('query', '')
         logger.info(f"Extracted query: {query}")
+        
         response = {"answer": f"收到：{query}"}
         logger.info(f"Returning response: {response}")
         return response
