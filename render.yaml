@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: echo "No dependencies to install"
-    startCommand: python get_only_server.py
+    startCommand: python single_endpoint_server.py
     envVars:
       - key: PORT
         value: 5000
