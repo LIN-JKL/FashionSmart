@@ -25,22 +25,25 @@ async def home():
 
 @app.get("/api/health")
 async def health():
+    logger.info("Health endpoint called")
     return {"status": "ok"}
 
 @app.post("/api/chat")
-async def chat(payload: dict = Body(...)):
-    logger.info(f"Chat request received: {payload}")
+async def chat(payload: dict):
+    logger.info(f"Chat endpoint called with payload: {payload}")
     try:
         query = payload.get('query', '')
+        logger.info(f"Extracted query: {query}")
         response = {"answer": f"收到：{query}"}
+        logger.info(f"Returning response: {response}")
         return response
     except Exception as e:
-        logger.error(f"Error processing chat: {e}")
+        logger.error(f"Error processing chat: {str(e)}")
         return {"error": "Internal server error"}, 500
 
-# 如果使用 uvicorn 直接运行此文件，不需要下面的 if 块
-# 但保留以便本地测试
+# 直接运行uvicorn
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 5000))
+    logger.info(f"Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
