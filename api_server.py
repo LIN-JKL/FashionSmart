@@ -59,6 +59,17 @@ def chat():
         print(f"Traceback: {error_traceback}")
         return jsonify({"error": f"服务器内部错误: {error_message}"}), 500
 
+# 根路径路由
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        "message": "FashionSmart API Server",
+        "endpoints": {
+            "/api/health": "GET - Health check",
+            "/api/chat": "POST - Chat endpoint"
+        }
+    })
+
 # 健康检查端点
 @app.route('/api/health', methods=['GET'])
 def health():
@@ -66,4 +77,5 @@ def health():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    print(f"Starting server on port {port}")
+    app.run(host='0.0.0.0', port=port, debug=False)
